@@ -1,5 +1,5 @@
 # Azure DevOps Pipeline: duration-labs-core
-# PR: Build+Test | main merge: Build+Test+Deploy
+# Self-hosted Agent (Netcup) — Build+Test+Deploy lokal
 
 trigger:
   branches:
@@ -12,21 +12,17 @@ pr:
       - main
       - feature/*
 
-pool:
-  vmImage: 'ubuntu-latest'
-
-variables:
-  NODE_VERSION: '20'
+pool: 'Netcup'
 
 stages:
   - stage: Build
     jobs:
       - job: Build
         steps:
-          - task: NodeTool@0
-            inputs:
-              versionSpec: '$(NODE_VERSION)'
-            displayName: 'Install Node.js'
+          - script: |
+              node --version
+              npm --version
+            displayName: 'Check Node.js'
 
           - script: npm ci
             displayName: 'Install dependencies'
@@ -41,11 +37,6 @@ stages:
     jobs:
       - job: Deploy
         steps:
-          - task: SSH@0
-            inputs:
-              sshEndpoint: 'tobaiaes-server'
-              runOptions: 'inline'
-              inline: |
-                set -e
-                echo "Core deploy — customize based on project needs"
-            displayName: 'Deploy to Production via SSH'
+          - script: |
+              echo "Core deploy — customize based on project needs"
+            displayName: 'Deploy to Production'
